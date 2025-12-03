@@ -28,7 +28,10 @@ const FeaturesToScore = () => {
       setLoadingMeta(true);
       try {
         const res = await fetch(`${API_URL}/features`);
-        if (!res.ok) throw new Error("Failed to load feature metadata");
+        if (!res.ok) {
+          const errorText = await res.text();
+          throw new Error(`Failed to load features (${res.status}): ${errorText || "Unknown error"}`);
+        }
         const data = (await res.json()) as FeaturesMeta;
         setMeta(data);
         const initial: Record<string, string> = {};
@@ -68,11 +71,28 @@ const FeaturesToScore = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      if (!res.ok) throw new Error("Prediction failed");
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        let errorMessage = `Prediction failed (${res.status})`;
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorMessage = errorJson.detail || errorJson.message || errorMessage;
+        } catch {
+          if (errorText) errorMessage += `: ${errorText}`;
+        }
+        throw new Error(errorMessage);
+      }
+      
       const data = (await res.json()) as FullPrediction;
       setResult(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      console.error("Prediction error:", err);
+      if (err instanceof TypeError && err.message.includes("fetch")) {
+        setError(`Cannot connect to API at ${API_URL}. Please check your VITE_API_URL configuration.`);
+      } else {
+        setError(err instanceof Error ? err.message : "Something went wrong");
+      }
     } finally {
       setLoadingPredict(false);
     }

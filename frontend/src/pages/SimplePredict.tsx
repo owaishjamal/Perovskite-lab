@@ -189,12 +189,29 @@ const SimplePredict = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error("Prediction failed");
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        let errorMessage = `Prediction failed (${res.status})`;
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorMessage = errorJson.detail || errorJson.message || errorMessage;
+        } catch {
+          if (errorText) errorMessage += `: ${errorText}`;
+        }
+        throw new Error(errorMessage);
+      }
+      
       const data = (await res.json()) as Prediction;
       setResult(data);
       setHistory((prev) => [data, ...prev].slice(0, 8));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      console.error("Prediction error:", err);
+      if (err instanceof TypeError && err.message.includes("fetch")) {
+        setError(`Cannot connect to API at ${API_URL}. Please check your VITE_API_URL configuration.`);
+      } else {
+        setError(err instanceof Error ? err.message : "Something went wrong");
+      }
     } finally {
       setLoading(false);
     }

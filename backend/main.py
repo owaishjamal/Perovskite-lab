@@ -125,17 +125,12 @@ CORS_ORIGINS = [
 if FRONTEND_URL:
     CORS_ORIGINS.append(FRONTEND_URL)
 
-# Allow common deployment platforms
-CORS_ORIGINS.extend([
-    "https://*.vercel.app",
-    "https://*.netlify.app",
-    "https://*.railway.app",
-    "https://*.onrender.com",
-])
-
+# CORS configuration - use regex for wildcard matching
+# FastAPI doesn't support wildcards in allow_origins, so we use allow_origin_regex
 app.add_middleware(
     CORSMiddleware,
     allow_origins=CORS_ORIGINS,
+    allow_origin_regex=r"https://.*\.(vercel\.app|netlify\.app|railway\.app|onrender\.com)$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

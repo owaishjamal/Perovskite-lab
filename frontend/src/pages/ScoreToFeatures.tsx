@@ -28,11 +28,28 @@ const ScoreToFeatures = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ target_score: val }),
       });
-      if (!res.ok) throw new Error("Failed to get recommendations");
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        let errorMessage = `Request failed (${res.status})`;
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorMessage = errorJson.detail || errorJson.message || errorMessage;
+        } catch {
+          if (errorText) errorMessage += `: ${errorText}`;
+        }
+        throw new Error(errorMessage);
+      }
+      
       const data = (await res.json()) as ScoreToFeaturesResponse;
       setResult(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      console.error("API error:", err);
+      if (err instanceof TypeError && err.message.includes("fetch")) {
+        setError(`Cannot connect to API at ${API_URL}. Please check your VITE_API_URL configuration.`);
+      } else {
+        setError(err instanceof Error ? err.message : "Something went wrong");
+      }
     } finally {
       setLoading(false);
     }
