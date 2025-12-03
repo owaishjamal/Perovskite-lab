@@ -1,0 +1,26 @@
+{
+  "num_cols": [
+    "Perovskite_band_gap",
+    "JV_default_Jsc",
+    "JV_default_Voc",
+    "JV_default_FF",
+    "Perovskite_deposition_thermal_annealing_temperature",
+    "Perovskite_deposition_thermal_annealing_time"
+  ],
+  "cat_cols": [
+    "Cell_architecture",
+    "Perovskite_composition_short_form",
+    "ETL_stack_sequence",
+    "HTL_stack_sequence",
+    "Perovskite_deposition_procedure",
+    "Perovskite_additives_compounds",
+    "Encapsulation"
+  ],
+  "p_min": 5.636000156402588,
+  "p_max": 20.260000228881836,
+  "s_min": 1.196000099182129,
+  "s_max": 1440.000244140625,
+  "sig_ref_p": 2.9300003051757812,
+  "sig_ref_s": 144.99996948242188,
+  "input_dim": 543
+}
