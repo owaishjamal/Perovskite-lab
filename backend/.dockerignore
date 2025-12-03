@@ -1,0 +1,16 @@
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+.git
+.gitignore
+.DS_Store
+*.log
+test_*.py
+RAILWAY_DEPLOYMENT.md
+
